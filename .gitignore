@@ -41,3 +41,10 @@ out
 test-output
 atlassian-ide-plugin.xml
 .gradletasknamecache
+
+/logs/
+
+# proxy class
+/cglib/
+/com/sun/proxy/
+/org/springframework/core/$Proxy*.class
