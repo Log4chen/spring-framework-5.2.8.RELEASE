@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+default-autowire="no">
+<!--通过default-autowire配置全局自动装配方式-->
+	<bean id="abc" class="fun.bitbit.autowiring.HelloService"/>
+	<!--通过setAbc方法装配-->
+	<bean class="fun.bitbit.autowiring.AutowireByName" autowire="byName"/>
+	<!--通过setXxx(HelloService helloService)方法注入-->
+	<bean class="fun.bitbit.autowiring.AutowireByType" autowire="byType"/>
+	<!--通过构造器装配，byName和byType通过使用无参构造器实例化对象-->
+	<bean class="fun.bitbit.autowiring.AutowireByConstructor" autowire="constructor" autowire-candidate="true"/>
+	<!-- in byType autowiring, set autowire-candidate="false" can exclude a bean from autowiring -->
+
+</beans>

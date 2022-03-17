@@ -1209,6 +1209,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
 
+		// 调用默认的无参构造器，实例化bean对象，这里还没有注入@Autowired依赖的bean成员
 		// No special handling: simply use no-arg constructor.
 		return instantiateBean(beanName, mbd);
 	}
@@ -1391,7 +1392,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
-
+		// xml配置 自动装配 autowire属性（和@Component @Autowired注解无关）
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
@@ -1437,7 +1438,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			checkDependencies(beanName, mbd, filteredPds, pvs);
 		}
-
+		// 当使用xml配置Bean，且使用autowiring时，pvs中包含了该Bean实例需要被注入的属性名称及其对象列表，即List<PropertyValue>
 		if (pvs != null) {
 			applyPropertyValues(beanName, mbd, bw, pvs);
 		}

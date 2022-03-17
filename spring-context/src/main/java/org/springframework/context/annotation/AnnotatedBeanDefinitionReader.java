@@ -126,6 +126,15 @@ public class AnnotatedBeanDefinitionReader {
 
 
 	/**
+	 * Register a bean from the given bean class, deriving its metadata from
+	 * class-declared annotations.
+	 * @param beanClass the class of the bean
+	 */
+	public void registerBean(Class<?> beanClass) {
+		doRegisterBean(beanClass, null, null, null, null);
+	}
+
+	/**
 	 * Register one or more component classes to be processed.
 	 * <p>Calls to {@code register} are idempotent; adding the same
 	 * component class more than once has no additional effect.
@@ -136,15 +145,6 @@ public class AnnotatedBeanDefinitionReader {
 		for (Class<?> componentClass : componentClasses) {
 			registerBean(componentClass);
 		}
-	}
-
-	/**
-	 * Register a bean from the given bean class, deriving its metadata from
-	 * class-declared annotations.
-	 * @param beanClass the class of the bean
-	 */
-	public void registerBean(Class<?> beanClass) {
-		doRegisterBean(beanClass, null, null, null, null);
 	}
 
 	/**

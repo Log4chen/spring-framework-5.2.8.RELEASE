@@ -1,5 +1,6 @@
 package fun.bitbit;
 
+import fun.bitbit.aware.MyApplicationContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.core.DebuggingClassWriter;
@@ -25,15 +26,17 @@ public class Application {
 //		AnnotationConfigApplicationContext context0 = new AnnotationConfigApplicationContext(Application.class);
 
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		context.register(Application.class);
+		context.register(Application.class); // 注册Application.class，只是将class维护到DefaultListableBeanFactory.beanDefinitionMap和beanDefinitionNames
 		context.addBeanFactoryPostProcessor(configurableListableBeanFactory -> logger.info("手动add的BeanFactoryPostProcessor"));
 		context.refresh();
 
 		TextEditor editor = context.getBean(TextEditor.class);
 		editor.inputText("hello");
 
-		context.close();
+		MyApplicationContextAware myApplicationContextAware = context.getBean(MyApplicationContextAware.class);
+		myApplicationContextAware.get();
 
-//		log.info("close application");
+		context.close();
+		logger.info("close application");
 	}
 }

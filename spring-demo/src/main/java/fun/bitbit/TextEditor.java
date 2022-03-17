@@ -8,6 +8,8 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 //import javax.annotation.Resource;
 //import javax.inject.Inject;
 
@@ -17,11 +19,16 @@ public class TextEditor {
 
 	private static final Logger log = LoggerFactory.getLogger(TextEditor.class);
 
-	@Autowired
+//	@Autowired
 //	@Resource
 //	@Inject
 //	@Qualifier("englishSpellChecker")
 	private ISpellChecker spellChecker;
+
+	@Resource
+	public void setSpellChecker(ISpellChecker spellChecker) {
+		this.spellChecker = spellChecker;
+	}
 
 	public void inputText(String text) {
 		spellChecker.check(text);

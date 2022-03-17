@@ -63,7 +63,18 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+		// 添加super()方便阅读源码，父类GenericApplicationContext的默认构造器中，会初始化DefaultListableBeanFactory
+		super();
+		// AnnotationConfigApplicationContext间接实现了BeanDefinitionRegistry接口，所以括号中的this可以作为registry
+
+		// 该reader注册了6个Spring内部的Processor/Listener（项目中存在JAP才会注册PersistenceAnnotationBeanPostProcessor）
+		// 只是将Class类添加到DefaultListableBeanFactory
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+
+		/**
+		 * context 提供{@link #scan}方法，给我们手动调用
+		 * context的自动扫描工作不是通过这个scanner完成的，而是在invoke ConfigurationClassPostProcessor时新new了一个
+		 */
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
