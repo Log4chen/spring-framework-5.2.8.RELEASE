@@ -21,6 +21,7 @@ import java.util.Iterator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.lang.Nullable;
 
 /**
@@ -50,6 +51,12 @@ public interface ConfigurableListableBeanFactory
 	void ignoreDependencyType(Class<?> type);
 
 	/**
+	 * 以给定 ApplicationContextAware 接口举例：
+	 * 当使用xml配置开启autowiring时，Bean A (implements ApplicationContextAware)中依赖 ApplicationContext，且自动装配的方法和ApplicationContextAware中方法的签名一致
+	 * 那么，对ApplicationContext依赖的装配，将不在populateBean阶段通过autowiring完成，而是在initializeBean阶段通过ApplicationContextAwareProcessor#invokeAwareInterfaces完成
+	 * 只针对 autowireByName和autowireByType，（constructor方式的自动装配还是在createBeanInstance阶段完成）
+	 * @see AbstractAutowireCapableBeanFactory#unsatisfiedNonSimpleProperties
+	 *
 	 * Ignore the given dependency interface for autowiring.
 	 * <p>This will typically be used by application contexts to register
 	 * dependencies that are resolved in other ways, like BeanFactory through

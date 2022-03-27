@@ -1,6 +1,6 @@
 package fun.bitbit.aware;
 
-import fun.bitbit.TextEditor;
+import fun.bitbit.service.impl.TextEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;

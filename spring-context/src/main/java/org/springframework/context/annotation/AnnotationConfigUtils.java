@@ -168,7 +168,9 @@ public abstract class AnnotationConfigUtils {
 		Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<>(8);
 
 		// QA 这些Processor/Listener在哪里调用了？ 这里只是添加到了DefaultListableBeanFactory.beanDefinitionMap和beanDefinitionNames
-
+		/**
+		 * @see DefaultListableBeanFactory#registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+		 */
 		// 1、(BeanFactoryPostProcessor) 注册用于处理@Configuration注解的处理器
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);

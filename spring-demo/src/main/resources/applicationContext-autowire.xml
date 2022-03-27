@@ -13,4 +13,10 @@ default-autowire="no">
 	<bean class="fun.bitbit.autowiring.AutowireByConstructor" autowire="constructor" autowire-candidate="true"/>
 	<!-- in byType autowiring, set autowire-candidate="false" can exclude a bean from autowiring -->
 
+	<bean class="fun.bitbit.autowiring.AutowireXxxAware" autowire="byType"/>
+
+	<bean id="ignoreDepTypeService" class="fun.bitbit.autowiring.IgnoreDepTypeServiceImpl"/>
+	<bean id="ignoreDepTypeProcessor" class="fun.bitbit.autowiring.IgnoreDepTypeProcessor"/>
+
+
 </beans>

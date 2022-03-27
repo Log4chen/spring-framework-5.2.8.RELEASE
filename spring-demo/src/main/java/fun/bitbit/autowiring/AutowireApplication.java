@@ -1,5 +1,6 @@
 package fun.bitbit.autowiring;
 
+import fun.bitbit.component.XxxAwareImpl;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -18,6 +19,10 @@ public class AutowireApplication {
 
 		AutowireByConstructor autowireByConstructor = context.getBean(AutowireByConstructor.class);
 		autowireByConstructor.sayHello("autowireByConstructor");
+
+		AutowireXxxAware autowireXxxAware = context.getBean(AutowireXxxAware.class);
+		autowireXxxAware.printContext();
+		autowireXxxAware.printIgnoreType();
 
 		context.close();
 	}

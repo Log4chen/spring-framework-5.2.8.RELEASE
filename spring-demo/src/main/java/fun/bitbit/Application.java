@@ -1,6 +1,8 @@
 package fun.bitbit;
 
 import fun.bitbit.aware.MyApplicationContextAware;
+import fun.bitbit.component.XxxAwareImpl;
+import fun.bitbit.service.impl.TextEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.core.DebuggingClassWriter;
@@ -12,7 +14,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @Configuration
 @ComponentScan("fun.bitbit")
 //@ImportResource("classpath:application.xml")
-@EnableAspectJAutoProxy(proxyTargetClass = true) // 开启aop,会添加一个BeanPostProcessor-AnnotationAwareAspectJAutoProxyCreator创建代理
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+// 开启aop,会添加一个BeanPostProcessor-AnnotationAwareAspectJAutoProxyCreator创建代理
 public class Application {
 	private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
@@ -28,6 +31,7 @@ public class Application {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 		context.register(Application.class); // 注册Application.class，只是将class维护到DefaultListableBeanFactory.beanDefinitionMap和beanDefinitionNames
 		context.addBeanFactoryPostProcessor(configurableListableBeanFactory -> logger.info("手动add的BeanFactoryPostProcessor"));
+		// refresh后才active，否则调用getBean会抛异常
 		context.refresh();
 
 		TextEditor editor = context.getBean(TextEditor.class);
@@ -35,6 +39,9 @@ public class Application {
 
 		MyApplicationContextAware myApplicationContextAware = context.getBean(MyApplicationContextAware.class);
 		myApplicationContextAware.get();
+
+		XxxAwareImpl xxxAwareImpl = context.getBean(XxxAwareImpl.class);
+		logger.info("xxxAwareImpl:" + xxxAwareImpl);
 
 		context.close();
 		logger.info("close application");

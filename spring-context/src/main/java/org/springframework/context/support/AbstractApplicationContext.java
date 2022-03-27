@@ -517,6 +517,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
+			// 1. Switch to active. refresh开头就active
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.（obtainFreshBeanFactory调用了两个需要由子类实现的抽象方法）
@@ -653,6 +654,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Configure the bean factory with context callbacks.
 		// 添加一个BeanPostProcessor后置处理器---ApplicationContextAwareProcessor，用来处理xxxAWare的注入
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+		// 对于xml配置开启autowiring自动装配，如果Bean实现了XxxAware接口，那么其中的xxx类型的属性的注入，将不在populateBean阶段通过autowiring完成，
+		// 而是在initializeBean阶段通过ApplicationContextAwareProcessor#invokeAwareInterfaces中完成
+		// 条件：Bean中的setXxx(Xxx x)方法和XxxAware接口的方法签名保持一致
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);

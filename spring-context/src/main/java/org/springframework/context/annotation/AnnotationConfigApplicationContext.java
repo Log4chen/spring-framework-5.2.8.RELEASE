@@ -72,8 +72,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 
 		/**
+		 * context的自动扫描工作不是通过this.scanner完成的，而是在invoke ConfigurationClassPostProcessor时新new了一个
 		 * context 提供{@link #scan}方法，给我们手动调用
-		 * context的自动扫描工作不是通过这个scanner完成的，而是在invoke ConfigurationClassPostProcessor时新new了一个
 		 */
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
