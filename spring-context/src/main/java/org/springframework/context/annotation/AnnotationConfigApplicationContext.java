@@ -64,6 +64,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext() {
 		// 添加super()方便阅读源码，父类GenericApplicationContext的默认构造器中，会初始化DefaultListableBeanFactory
+		// ignoredDependencyInterfaces: BeanNameAware, BeanFactoryAware, BeanClassLoaderAware
 		super();
 		// AnnotationConfigApplicationContext间接实现了BeanDefinitionRegistry接口，所以括号中的this可以作为registry
 

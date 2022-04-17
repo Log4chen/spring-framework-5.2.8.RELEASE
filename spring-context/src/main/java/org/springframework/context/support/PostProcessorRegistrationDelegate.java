@@ -35,6 +35,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.core.OrderComparator;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
@@ -52,7 +53,11 @@ final class PostProcessorRegistrationDelegate {
 	private PostProcessorRegistrationDelegate() {
 	}
 
-
+	/**
+	 * @param beanFactory
+	 * @param beanFactoryPostProcessors 自定义添加的BeanFactoryPostProcessor
+	 * @see AbstractApplicationContext#beanFactoryPostProcessors
+	 */
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
@@ -83,6 +88,7 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
+			// postProcessorNames中只有org.springframework.context.annotation.internalConfigurationAnnotationProcessor, 即 ConfigurationClassPostProcessor
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
@@ -93,6 +99,10 @@ final class PostProcessorRegistrationDelegate {
 			}
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
+			/**
+			 * invoke之前，BeanFactory#beanDefinitionMap中有 Spring内部的5个Class + 启动类MyApplication.Class，invoke后会包含用户自定义的Bean Class
+			 * @see ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry
+			 */
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 
@@ -128,10 +138,14 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
+			/**
+			 * invoke ConfigurationClassPostProcessor
+			 * @see ConfigurationClassPostProcessor#postProcessBeanFactory
+			 */
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
+			// invoke 用户调用ApplicationContext#addBeanFactoryPostProcessor添加的BeanFactoryPostProcessor#postProcessBeanFactory
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}
-
 		else {
 			// Invoke factory processors registered with the context instance.
 			invokeBeanFactoryPostProcessors(beanFactoryPostProcessors, beanFactory);
@@ -139,6 +153,7 @@ final class PostProcessorRegistrationDelegate {
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let the bean factory post-processors apply to them!
+		// ConfigurationClassPostProcessor, EventListenerMethodProcessor 以及用户自定义的@Component中的BeanFactoryPostProcessor（不包括调用ApplicationContext#addBeanFactoryPostProcessor添加的）
 		String[] postProcessorNames =
 				beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
@@ -188,7 +203,7 @@ final class PostProcessorRegistrationDelegate {
 
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
-
+		// AutowiredAnnotationBeanPostProcessor, CommonAnnotationBeanPostProcessor, internalAutoProxyCreator(如果启动类加了@EnableAspectJAutoProxy), 以及@Component的BeanPostProcessor
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when

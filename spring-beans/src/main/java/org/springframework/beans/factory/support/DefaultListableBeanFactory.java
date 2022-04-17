@@ -1266,7 +1266,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (multipleBeans != null) {
 				return multipleBeans;
 			}
-
+			//
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, type, descriptor);
 			if (matchingBeans.isEmpty()) {
 				if (isRequired(descriptor)) {
@@ -1304,6 +1304,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				autowiredBeanNames.add(autowiredBeanName);
 			}
 			if (instanceCandidate instanceof Class) {
+				// 即调用 beanFactory.getBean(beanName)
 				instanceCandidate = descriptor.resolveCandidate(autowiredBeanName, type, this);
 			}
 			Object result = instanceCandidate;

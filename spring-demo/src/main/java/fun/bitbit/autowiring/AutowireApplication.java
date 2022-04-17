@@ -24,6 +24,8 @@ public class AutowireApplication {
 		autowireXxxAware.printContext();
 		autowireXxxAware.printIgnoreType();
 
+		Object abc = context.getBean("abc");
+
 		context.close();
 	}
 }

@@ -711,7 +711,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					DependencyDescriptor currDesc = new DependencyDescriptor(methodParam, this.required);
 					currDesc.setContainingClass(bean.getClass());
 					descriptors[i] = currDesc;
-					try {
+					try { // 获得依赖的Bean对象
 						Object arg = beanFactory.resolveDependency(currDesc, beanName, autowiredBeans, typeConverter);
 						if (arg == null && !this.required) {
 							arguments = null;
@@ -751,6 +751,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			}
 			if (arguments != null) {
 				try {
+					// 注入依赖
 					ReflectionUtils.makeAccessible(method);
 					method.invoke(bean, arguments);
 				}

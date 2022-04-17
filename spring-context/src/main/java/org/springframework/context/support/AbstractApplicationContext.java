@@ -517,7 +517,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
-			// 1. Switch to active. refresh开头就active
+			// 1. Switch to active.
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.（obtainFreshBeanFactory调用了两个需要由子类实现的抽象方法）
@@ -530,10 +530,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);
 
-				// Invoke factory processors registered as beans in the context.
+				// Invoke factory processors registered as beans in the context. invoke BeanFactoryPostProcessor
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// Register bean processors that intercept bean creation.
+				// Register bean processors that intercept bean creation. 注册拦截Bean创建过程的BeanPostProcessor
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -548,6 +548,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Check for listener beans and register them.
 				registerListeners();
 
+				// 实例化普通的单例Bean （Spring内部的Bean及自定义的BeanPostProcessor, BeanFactoryPostProcessor已经在前面实例化过了）
 				// Instantiate all remaining (non-lazy-init) singletons.
 				finishBeanFactoryInitialization(beanFactory);
 
@@ -709,6 +710,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		// getBeanFactoryPostProcessors() 返回的是通过AbstractApplicationContext#addBeanFactoryPostProcessor添加的自定义的BeanFactoryPostProcessor
+		// 这里主要是invoke了 ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry 和 用户自定义的 BeanFactoryPostProcessor，前着会解析启动类的注解及方法上的@Bean，加载Class及Properties等
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
