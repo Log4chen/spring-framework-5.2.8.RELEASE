@@ -223,6 +223,7 @@ import org.springframework.util.StringUtils;
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				// 添加到singletonsCurrentlyInCreation，表示正在创建
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -230,6 +231,7 @@ import org.springframework.util.StringUtils;
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 					try {
+						/** 即调用 {@link AbstractAutowireCapableBeanFactory#createBean(String, RootBeanDefinition, Object[])} */
 						singletonObject = singletonFactory.getObject();
 						newSingleton = true;
 					}

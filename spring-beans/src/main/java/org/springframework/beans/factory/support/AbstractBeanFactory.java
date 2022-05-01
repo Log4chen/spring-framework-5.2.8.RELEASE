@@ -242,11 +242,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
-
+		// 如果是需要由FactoryBean创建的Bean，以Car和MyCarFactoryBean为例，这里的入参name为"myCarFactoryBean"，requiredType为"Car"
 		String beanName = transformedBeanName(name);
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		// 如果是FactoryBean，beanName为myCarFactoryBean，返回的sharedInstance不为空，为FactoryBean类的单例对象
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
@@ -321,6 +322,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				if (mbd.isSingleton()) {
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
+								/** 即 {@link AbstractAutowireCapableBeanFactory#createBean(String, RootBeanDefinition, Object[])} */
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {

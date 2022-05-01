@@ -552,7 +552,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (mbd.isSingleton()) {
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
-		if (instanceWrapper == null) { // 这里只是创建了Bean对象，还没有对其属性成员依赖进行注入
+		if (instanceWrapper == null) {
+			// 这里只是创建了Bean对象，还没有对其属性成员依赖进行注入
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		Object bean = instanceWrapper.getWrappedInstance();
@@ -583,7 +584,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (logger.isTraceEnabled()) {
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
-			} // QA add
+			}
+			// 当A和B循环依赖时，在populate A时，要注入B，getBean(B)又需要注入A，此时通过 A 的 singletonFactory 获得A实例的指针
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -1378,7 +1380,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				return;
 			}
 		}
-		// 1. InstantiationAwareBeanPostProcessor#postProcessAfterInstantiation
+		// 1. InstantiationAwareBeanPostProcessor#postProcessAfterInstantiation 具体使用场景未知
 		// Give any InstantiationAwareBeanPostProcessors the opportunity to modify the
 		// state of the bean before properties are set. This can be used, for example,
 		// to support styles of field injection.
@@ -1392,9 +1394,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 		}
-		// 2. PropertyValues
+		// propertyValues在add BeanDefinition时添加，使用方式参见 DefaultListableBeanFactoryTests#canReferenceParentBeanFromChildViaAlias
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
-		// 3. xml配置 自动装配 autowire属性（和@Component @Autowired注解无关）
+		// 2. xml配置 自动装配 autowire属性（和@Component @Autowired注解无关） 这里只是收集property value，注入的代码在方法最后
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
@@ -1411,13 +1413,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
-		// 4. InstantiationAwareBeanPostProcessor#postProcessProperties
-		// 依赖的对象会在这里被注入 AutowiredAnnotationBeanPostProcessor(@Autowired, @Inject, @Value等) CommonAnnotationBeanPostProcessor(@PostConstruct, @Resource等)
 		PropertyDescriptor[] filteredPds = null;
 		if (hasInstAwareBpps) {
 			if (pvs == null) {
 				pvs = mbd.getPropertyValues();
 			}
+			// 3. InstantiationAwareBeanPostProcessor#postProcessProperties
+			// 依赖的对象会在这里被注入 AutowiredAnnotationBeanPostProcessor(@Autowired, @Inject, @Value等) CommonAnnotationBeanPostProcessor(@PostConstruct, @Resource等)
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
@@ -1783,11 +1785,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				return null;
 			}, getAccessControlContext());
 		}
-		// 1. BeanNameAware, BeanClassLoaderAware, BeanFactoryAware
+		// 1. call BeanNameAware, BeanClassLoaderAware, BeanFactoryAware setXxx(Xxx) method
 		else {
 			invokeAwareMethods(beanName, bean);
 		}
 		// 2. BeanPostProcessor#postProcessBeforeInitialization
+		// ApplicationContextAwareProcessor call EnvironmentAware,ResourceLoaderAware,MessageSourceAware,ApplicationContextAware等 setXxx()
+		// InitDestroyAnnotationBeanPostProcessor invoke @PostConstruct method
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
@@ -1861,7 +1865,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				((InitializingBean) bean).afterPropertiesSet();
 			}
 		}
-
+		// xml config <bean ... init-method = "methodName">
 		if (mbd != null && bean.getClass() != NullBean.class) {
 			String initMethodName = mbd.getInitMethodName();
 			if (StringUtils.hasLength(initMethodName) &&
